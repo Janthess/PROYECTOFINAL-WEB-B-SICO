@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sistema de registro y administración de alumnos"
+    >
+
+    <title>Sistema de Registro de Alumnos</title>
+
+    <!-- Referencia al archivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="encabezado">
+        <div class="contenedor">
+            <h1>Sistema de Registro de Alumnos</h1>
+            <p>By Panteras</p>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenedor contenido-principal">
+
+        <!-- FORMULARIO -->
+        <section
+            class="panel formulario-panel"
+            aria-labelledby="titulo-formulario"
+        >
+
+            <div class="titulo-seccion">
+                <div>
+                    <h2 id="titulo-formulario">
+                        Registrar alumno
+                    </h2>
+                </div>
+
+                <button
+                    id="btnCancelarEdicion"
+                    class="boton boton-secundario oculto"
+                    type="button"
+                >
+                    Cancelar edición
+                </button>
+            </div>
+
+            <form id="formularioAlumno" novalidate>
+
+                <!-- Guarda el ID cuando se edita un alumno -->
+                <input type="hidden" id="alumnoId">
+
+                <div class="cuadricula-formulario">
+
+                    <!-- NOMBRE -->
+                    <div class="grupo-campo">
+                        <label for="nombre">
+                            Nombre completo
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            placeholder="Ej. Ana Martínez López"
+                            autocomplete="name"
+                        >
+
+                        <small
+                            class="mensaje-error"
+                            id="errorNombre"
+                        ></small>
+                    </div>
+
+                    <!-- MATRÍCULA -->
+                    <div class="grupo-campo">
+                        <label for="matricula">
+                            Matrícula
+                        </label>
+
+                        <input
+                            type="text"
+                            id="matricula"
+                            name="matricula"
+                            placeholder="Ej. A2026001"
+                            autocomplete="off"
+                        >
+
+                        <small
+                            class="mensaje-error"
+                            id="errorMatricula"
+                        ></small>
+                    </div>
+
+                    <!-- CORREO -->
+                    <div class="grupo-campo">
+                        <label for="correo">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            id="correo"
+                            name="correo"
+                            placeholder="Ej. alumno@correo.com"
+                            autocomplete="email"
+                        >
+
+                        <small
+                            class="mensaje-error"
+                            id="errorCorreo"
+                        ></small>
+                    </div>
+
+                    <!-- EDAD -->
+                    <div class="grupo-campo">
+                        <label for="edad">
+                            Edad
+                        </label>
+
+                        <input
+                            type="number"
+                            id="edad"
+                            name="edad"
+                            placeholder="Ej. 20"
+                            min="15"
+                            max="80"
+                        >
+
+                        <small
+                            class="mensaje-error"
+                            id="errorEdad"
+                        ></small>
+                    </div>
+
+                    <!-- CARRERA -->
+                    <div class="grupo-campo">
+                        <label for="carrera">
+                            Carrera
+                        </label>
+
+                        <select id="carrera" name="carrera">
+                            <option value="">
+                                Selecciona una carrera
+                            </option>
+
+                            <option value="Tecnologías de la Información">
+                                Tecnologías de la Información
+                            </option>
+
+                            <option value="Administración">
+                                Administración
+                            </option>
+
+                            <option value="Derecho">
+                                Derecho
+                            </option>
+
+                            <option value="Contaduría">
+                                Contaduría
+                            </option>
+
+                            <option value="Diseño Gráfico">
+                                Diseño Gráfico
+                            </option>
+                        </select>
+
+                        <small
+                            class="mensaje-error"
+                            id="errorCarrera"
+                        ></small>
+                    </div>
+
+                    <!-- SEMESTRE -->
+                    <div class="grupo-campo">
+                        <label for="semestre">
+                            Semestre
+                        </label>
+
+                        <select id="semestre" name="semestre">
+                            <option value="">
+                                Selecciona un semestre
+                            </option>
+
+                            <option value="1">1.º semestre</option>
+                            <option value="2">2.º semestre</option>
+                            <option value="3">3.º semestre</option>
+                            <option value="4">4.º semestre</option>
+                            <option value="5">5.º semestre</option>
+                            <option value="6">6.º semestre</option>
+                            <option value="7">7.º semestre</option>
+                            <option value="8">8.º semestre</option>
+                            <option value="9">9.º semestre</option>
+                            <option value="10">10.º semestre</option>
+                        </select>
+
+                        <small
+                            class="mensaje-error"
+                            id="errorSemestre"
+                        ></small>
+                    </div>
+
+                </div>
+
+                <!-- MENSAJES DEL FORMULARIO -->
+                <div
+                    id="mensajeFormulario"
+                    class="mensaje-pagina"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <button
+                    id="btnGuardar"
+                    class="boton boton-primario"
+                    type="submit"
+                >
+                    Registrar alumno
+                </button>
+
+            </form>
+        </section>
+
+        <!-- LISTADO DE ALUMNOS -->
+        <section
+            class="panel"
+            aria-labelledby="titulo-listado"
+        >
+
+            <div class="titulo-seccion titulo-listado">
+
+                <div>
+                    <h2 id="titulo-listado">
+                        Listado de alumnos
+                    </h2>
+                </div>
+
+                <div class="contador">
+                    <span id="totalAlumnos">0</span>
+                    <small>Total registrados</small>
+                </div>
+
+            </div>
+
+            <!-- BÚSQUEDA Y FILTROS -->
+            <div class="barra-herramientas">
+
+                <!-- BUSCAR POR NOMBRE -->
+                <div class="grupo-filtro filtro-busqueda">
+                    <label for="busqueda">
+                        Buscar por nombre
+                    </label>
+
+                    <input
+                        type="search"
+                        id="busqueda"
+                        placeholder="Escribe un nombre..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <!-- FILTRO POR CARRERA -->
+                <div class="grupo-filtro">
+                    <label for="filtroCarrera">
+                        Filtrar por carrera
+                    </label>
+
+                    <select id="filtroCarrera">
+                        <option value="todas">
+                            Todas las carreras
+                        </option>
+
+                        <option value="Tecnologías de la Información">
+                            Tecnologías de la Información
+                        </option>
+
+                        <option value="Administración">
+                            Administración
+                        </option>
+
+                        <option value="Derecho">
+                            Derecho
+                        </option>
+
+                        <option value="Contaduría">
+                            Contaduría
+                        </option>
+
+                        <option value="Diseño Gráfico">
+                            Diseño Gráfico
+                        </option>
+                    </select>
+                </div>
+
+                <!-- FILTRO POR SEMESTRE -->
+                <div class="grupo-filtro">
+                    <label for="filtroSemestre">
+                        Filtrar por semestre
+                    </label>
+
+                    <select id="filtroSemestre">
+                        <option value="todos">
+                            Todos los semestres
+                        </option>
+
+                        <option value="1">1.º semestre</option>
+                        <option value="2">2.º semestre</option>
+                        <option value="3">3.º semestre</option>
+                        <option value="4">4.º semestre</option>
+                        <option value="5">5.º semestre</option>
+                        <option value="6">6.º semestre</option>
+                        <option value="7">7.º semestre</option>
+                        <option value="8">8.º semestre</option>
+                        <option value="9">9.º semestre</option>
+                        <option value="10">10.º semestre</option>
+                    </select>
+                </div>
+
+                <!-- LIMPIAR FILTROS -->
+                <button
+                    id="btnLimpiarFiltros"
+                    class="boton boton-secundario"
+                    type="button"
+                >
+                    Limpiar filtros
+                </button>
+
+            </div>
+
+            <!-- MENSAJES DEL LISTADO -->
+            <div
+                id="mensajeListado"
+                class="mensaje-pagina"
+                role="status"
+                aria-live="polite"
+            ></div>
+
+            <!-- TABLA -->
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Matrícula</th>
+                            <th>Correo</th>
+                            <th>Edad</th>
+                            <th>Carrera</th>
+                            <th>Semestre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <!-- JavaScript agrega aquí los alumnos -->
+                    <tbody id="cuerpoTabla"></tbody>
+
+                </table>
+
+            </div>
+
+            <!-- MENSAJE CUANDO NO HAY ALUMNOS -->
+            <div id="estadoVacio" class="estado-vacio">
+
+                <div class="icono-vacio">
+                    🎓
+                </div>
+
+                <h3>No hay alumnos para mostrar</h3>
+
+                <p>
+                    Registra un alumno o cambia los criterios de búsqueda.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+
+        <div class="contenedor pie-contenido">
+
+            <p>
+                <strong>Antonio Ramírez</strong>
+            </p>
+
+            <p>
+                Matrícula:
+                <span class="dato-pendiente">
+                    ESCRIBE AQUÍ TU MATRÍCULA
+                </span>
+            </p>
+
+        </div>
+
+    </footer>
+
+    <!-- Referencia al archivo JavaScript -->
+    <script src="app.js"></script>
+
+</body>
+
+</html>

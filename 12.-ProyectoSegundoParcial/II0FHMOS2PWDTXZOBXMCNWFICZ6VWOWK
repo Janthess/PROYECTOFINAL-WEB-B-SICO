@@ -1,0 +1,700 @@
+// ================================
+// SISTEMA DE REGISTRO DE ALUMNOS
+// ================================
+
+// Arreglo principal donde se almacenan los alumnos.
+let alumnos = obtenerAlumnosGuardados();
+
+// Referencias del formulario.
+const formularioAlumno = document.getElementById("formularioAlumno");
+const alumnoId = document.getElementById("alumnoId");
+const nombre = document.getElementById("nombre");
+const matricula = document.getElementById("matricula");
+const correo = document.getElementById("correo");
+const edad = document.getElementById("edad");
+const carrera = document.getElementById("carrera");
+const semestre = document.getElementById("semestre");
+
+// Referencias del listado y filtros.
+const cuerpoTabla = document.getElementById("cuerpoTabla");
+const totalAlumnos = document.getElementById("totalAlumnos");
+const busqueda = document.getElementById("busqueda");
+const filtroCarrera = document.getElementById("filtroCarrera");
+const filtroSemestre = document.getElementById("filtroSemestre");
+const estadoVacio = document.getElementById("estadoVacio");
+
+// Botones y mensajes.
+const btnGuardar = document.getElementById("btnGuardar");
+const btnCancelarEdicion = document.getElementById("btnCancelarEdicion");
+const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
+const mensajeFormulario = document.getElementById("mensajeFormulario");
+const mensajeListado = document.getElementById("mensajeListado");
+
+// Campos que se validarán.
+const camposFormulario = [
+    nombre,
+    matricula,
+    correo,
+    edad,
+    carrera,
+    semestre
+];
+
+// =====================================
+// EVENTOS CON addEventListener()
+// =====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+    mostrarAlumnos();
+});
+
+formularioAlumno.addEventListener("submit", guardarAlumno);
+
+busqueda.addEventListener("input", mostrarAlumnos);
+filtroCarrera.addEventListener("change", mostrarAlumnos);
+filtroSemestre.addEventListener("change", mostrarAlumnos);
+
+btnLimpiarFiltros.addEventListener("click", limpiarFiltros);
+btnCancelarEdicion.addEventListener("click", cancelarEdicion);
+
+// Delegación de eventos para los botones editar y eliminar.
+cuerpoTabla.addEventListener("click", gestionarAccionesTabla);
+
+// Limpiar errores mientras el usuario escribe.
+camposFormulario.forEach(function (campo) {
+    campo.addEventListener("input", function () {
+        limpiarErrorCampo(campo);
+    });
+
+    campo.addEventListener("change", function () {
+        limpiarErrorCampo(campo);
+    });
+});
+
+// =====================================
+// REGISTRAR O ACTUALIZAR ALUMNOS
+// =====================================
+
+function guardarAlumno(evento) {
+    evento.preventDefault();
+
+    limpiarMensajes();
+
+    const datosAlumno = obtenerDatosFormulario();
+
+    if (!validarFormulario(datosAlumno)) {
+        mostrarMensaje(
+            mensajeFormulario,
+            "Revisa los campos marcados antes de guardar el alumno.",
+            "error"
+        );
+
+        return;
+    }
+
+    const idEnEdicion = Number(alumnoId.value);
+
+    if (idEnEdicion) {
+        actualizarAlumno(idEnEdicion, datosAlumno);
+    } else {
+        agregarAlumno(datosAlumno);
+    }
+
+    guardarEnLocalStorage();
+    mostrarAlumnos();
+    reiniciarFormulario();
+}
+
+function obtenerDatosFormulario() {
+    return {
+        nombre: nombre.value.trim(),
+        matricula: matricula.value.trim().toUpperCase(),
+        correo: correo.value.trim().toLowerCase(),
+        edad: Number(edad.value),
+        carrera: carrera.value,
+        semestre: Number(semestre.value)
+    };
+}
+
+function agregarAlumno(datosAlumno) {
+    const nuevoAlumno = {
+        id: Date.now(),
+        nombre: datosAlumno.nombre,
+        matricula: datosAlumno.matricula,
+        correo: datosAlumno.correo,
+        edad: datosAlumno.edad,
+        carrera: datosAlumno.carrera,
+        semestre: datosAlumno.semestre
+    };
+
+    // push() agrega un elemento al final del arreglo.
+    alumnos.push(nuevoAlumno);
+
+    mostrarMensaje(
+        mensajeFormulario,
+        "El alumno " + nuevoAlumno.nombre + " fue registrado correctamente.",
+        "exito"
+    );
+}
+
+function actualizarAlumno(id, datosAlumno) {
+    // findIndex() localiza la posición del alumno.
+    const indiceAlumno = alumnos.findIndex(function (alumno) {
+        return alumno.id === id;
+    });
+
+    if (indiceAlumno === -1) {
+        mostrarMensaje(
+            mensajeFormulario,
+            "No fue posible localizar el alumno que deseas editar.",
+            "error"
+        );
+
+        return;
+    }
+
+    alumnos[indiceAlumno] = {
+        id: id,
+        nombre: datosAlumno.nombre,
+        matricula: datosAlumno.matricula,
+        correo: datosAlumno.correo,
+        edad: datosAlumno.edad,
+        carrera: datosAlumno.carrera,
+        semestre: datosAlumno.semestre
+    };
+
+    mostrarMensaje(
+        mensajeFormulario,
+        "La información de " + datosAlumno.nombre + " fue actualizada.",
+        "exito"
+    );
+}
+
+// =====================================
+// VALIDACIONES
+// =====================================
+
+function validarFormulario(datosAlumno) {
+    let formularioValido = true;
+
+    limpiarTodosLosErrores();
+
+    if (datosAlumno.nombre.length < 3) {
+        marcarError(
+            nombre,
+            "Escribe un nombre de al menos 3 caracteres."
+        );
+
+        formularioValido = false;
+    }
+
+    if (!/^[A-Z0-9-]{4,15}$/.test(datosAlumno.matricula)) {
+        marcarError(
+            matricula,
+            "Usa entre 4 y 15 letras, números o guiones."
+        );
+
+        formularioValido = false;
+    } else if (matriculaDuplicada(datosAlumno.matricula)) {
+        marcarError(
+            matricula,
+            "Esta matrícula ya está registrada."
+        );
+
+        formularioValido = false;
+    }
+
+    if (!validarCorreo(datosAlumno.correo)) {
+        marcarError(
+            correo,
+            "Escribe un correo electrónico válido."
+        );
+
+        formularioValido = false;
+    }
+
+    if (
+        !Number.isInteger(datosAlumno.edad) ||
+        datosAlumno.edad < 15 ||
+        datosAlumno.edad > 80
+    ) {
+        marcarError(
+            edad,
+            "La edad debe ser un número entre 15 y 80."
+        );
+
+        formularioValido = false;
+    }
+
+    if (!datosAlumno.carrera) {
+        marcarError(
+            carrera,
+            "Selecciona una carrera."
+        );
+
+        formularioValido = false;
+    }
+
+    if (
+        !Number.isInteger(datosAlumno.semestre) ||
+        datosAlumno.semestre < 1 ||
+        datosAlumno.semestre > 10
+    ) {
+        marcarError(
+            semestre,
+            "Selecciona un semestre."
+        );
+
+        formularioValido = false;
+    }
+
+    return formularioValido;
+}
+
+function validarCorreo(valorCorreo) {
+    const expresionCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return expresionCorreo.test(valorCorreo);
+}
+
+function matriculaDuplicada(valorMatricula) {
+    const idActual = Number(alumnoId.value);
+
+    // find() busca un alumno con la misma matrícula.
+    const alumnoEncontrado = alumnos.find(function (alumno) {
+        return (
+            alumno.matricula === valorMatricula &&
+            alumno.id !== idActual
+        );
+    });
+
+    return Boolean(alumnoEncontrado);
+}
+
+function marcarError(campo, mensaje) {
+    campo.classList.add("campo-invalido");
+
+    const nombreError =
+        "error" +
+        campo.id.charAt(0).toUpperCase() +
+        campo.id.slice(1);
+
+    const elementoError = document.getElementById(nombreError);
+
+    if (elementoError) {
+        elementoError.textContent = mensaje;
+    }
+}
+
+function limpiarErrorCampo(campo) {
+    campo.classList.remove("campo-invalido");
+
+    const nombreError =
+        "error" +
+        campo.id.charAt(0).toUpperCase() +
+        campo.id.slice(1);
+
+    const elementoError = document.getElementById(nombreError);
+
+    if (elementoError) {
+        elementoError.textContent = "";
+    }
+}
+
+function limpiarTodosLosErrores() {
+    camposFormulario.forEach(function (campo) {
+        limpiarErrorCampo(campo);
+    });
+}
+
+// =====================================
+// MOSTRAR, BUSCAR, FILTRAR Y ORDENAR
+// =====================================
+
+function mostrarAlumnos() {
+    const alumnosFiltrados = obtenerAlumnosFiltrados();
+
+    // sort() ordena alfabéticamente.
+    const alumnosOrdenados = [...alumnosFiltrados].sort(
+        function (alumnoA, alumnoB) {
+            return alumnoA.nombre.localeCompare(
+                alumnoB.nombre,
+                "es",
+                {
+                    sensitivity: "base"
+                }
+            );
+        }
+    );
+
+    // map() convierte cada alumno en una fila HTML.
+    cuerpoTabla.innerHTML = alumnosOrdenados
+        .map(function (alumno) {
+            return crearFilaAlumno(alumno);
+        })
+        .join("");
+
+    totalAlumnos.textContent = alumnos.length;
+
+    const noHayResultados = alumnosOrdenados.length === 0;
+
+    estadoVacio.classList.toggle(
+        "visible",
+        noHayResultados
+    );
+
+    const tablaContenedor = document.querySelector(
+        ".tabla-contenedor"
+    );
+
+    if (noHayResultados) {
+        tablaContenedor.style.display = "none";
+    } else {
+        tablaContenedor.style.display = "block";
+    }
+
+    actualizarMensajeResultados(
+        alumnosOrdenados.length
+    );
+}
+
+function obtenerAlumnosFiltrados() {
+    const textoBusqueda = normalizarTexto(
+        busqueda.value
+    );
+
+    const carreraSeleccionada =
+        filtroCarrera.value;
+
+    const semestreSeleccionado =
+        filtroSemestre.value;
+
+    // filter() realiza la búsqueda y los filtros.
+    return alumnos.filter(function (alumno) {
+        const coincideNombre =
+            normalizarTexto(alumno.nombre).includes(
+                textoBusqueda
+            );
+
+        const coincideCarrera =
+            carreraSeleccionada === "todas" ||
+            alumno.carrera === carreraSeleccionada;
+
+        const coincideSemestre =
+            semestreSeleccionado === "todos" ||
+            alumno.semestre === Number(semestreSeleccionado);
+
+        return (
+            coincideNombre &&
+            coincideCarrera &&
+            coincideSemestre
+        );
+    });
+}
+
+function crearFilaAlumno(alumno) {
+    return `
+        <tr>
+            <td>
+                <strong>${escaparHTML(alumno.nombre)}</strong>
+            </td>
+
+            <td>
+                ${escaparHTML(alumno.matricula)}
+            </td>
+
+            <td>
+                ${escaparHTML(alumno.correo)}
+            </td>
+
+            <td>
+                ${alumno.edad}
+            </td>
+
+            <td>
+                ${escaparHTML(alumno.carrera)}
+            </td>
+
+            <td>
+                <span class="insignia">
+                    ${alumno.semestre}.º
+                </span>
+            </td>
+
+            <td>
+                <div class="acciones">
+                    <button
+                        class="boton-accion boton-editar"
+                        type="button"
+                        data-accion="editar"
+                        data-id="${alumno.id}"
+                    >
+                        Editar
+                    </button>
+
+                    <button
+                        class="boton-accion boton-eliminar"
+                        type="button"
+                        data-accion="eliminar"
+                        data-id="${alumno.id}"
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function actualizarMensajeResultados(cantidadResultados) {
+    const hayFiltros =
+        busqueda.value.trim() !== "" ||
+        filtroCarrera.value !== "todas" ||
+        filtroSemestre.value !== "todos";
+
+    if (!hayFiltros) {
+        limpiarMensaje(mensajeListado);
+        return;
+    }
+
+    let texto;
+
+    if (cantidadResultados === 1) {
+        texto = "Se encontró 1 alumno.";
+    } else {
+        texto =
+            "Se encontraron " +
+            cantidadResultados +
+            " alumnos.";
+    }
+
+    mostrarMensaje(
+        mensajeListado,
+        texto,
+        "info"
+    );
+}
+
+function normalizarTexto(texto) {
+    return texto
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+// =====================================
+// EDITAR Y ELIMINAR
+// =====================================
+
+function gestionarAccionesTabla(evento) {
+    const boton = evento.target.closest(
+        "button[data-accion]"
+    );
+
+    if (!boton) {
+        return;
+    }
+
+    const id = Number(boton.dataset.id);
+    const accion = boton.dataset.accion;
+
+    if (accion === "editar") {
+        cargarAlumnoParaEditar(id);
+    }
+
+    if (accion === "eliminar") {
+        eliminarAlumno(id);
+    }
+}
+
+function cargarAlumnoParaEditar(id) {
+    // find() obtiene el alumno seleccionado.
+    const alumno = alumnos.find(function (elemento) {
+        return elemento.id === id;
+    });
+
+    if (!alumno) {
+        mostrarMensaje(
+            mensajeListado,
+            "No fue posible encontrar el alumno seleccionado.",
+            "error"
+        );
+
+        return;
+    }
+
+    alumnoId.value = alumno.id;
+    nombre.value = alumno.nombre;
+    matricula.value = alumno.matricula;
+    correo.value = alumno.correo;
+    edad.value = alumno.edad;
+    carrera.value = alumno.carrera;
+    semestre.value = alumno.semestre;
+
+    btnGuardar.textContent = "Guardar cambios";
+
+    btnCancelarEdicion.classList.remove(
+        "oculto"
+    );
+
+    limpiarTodosLosErrores();
+    limpiarMensaje(mensajeFormulario);
+
+    document
+        .querySelector(".formulario-panel")
+        .scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+}
+
+function eliminarAlumno(id) {
+    // findIndex() obtiene la posición del alumno.
+    const indiceAlumno = alumnos.findIndex(
+        function (alumno) {
+            return alumno.id === id;
+        }
+    );
+
+    if (indiceAlumno === -1) {
+        mostrarMensaje(
+            mensajeListado,
+            "No fue posible localizar el alumno que deseas eliminar.",
+            "error"
+        );
+
+        return;
+    }
+
+    const alumnoEliminado =
+        alumnos[indiceAlumno];
+
+    // splice() elimina un alumno del arreglo.
+    alumnos.splice(indiceAlumno, 1);
+
+    guardarEnLocalStorage();
+    mostrarAlumnos();
+
+    if (Number(alumnoId.value) === id) {
+        reiniciarFormulario();
+    }
+
+    mostrarMensaje(
+        mensajeListado,
+        "El alumno " +
+            alumnoEliminado.nombre +
+            " fue eliminado del registro.",
+        "exito"
+    );
+}
+
+// =====================================
+// LIMPIAR FORMULARIO Y FILTROS
+// =====================================
+
+function reiniciarFormulario() {
+    formularioAlumno.reset();
+
+    alumnoId.value = "";
+
+    btnGuardar.textContent =
+        "Registrar alumno";
+
+    btnCancelarEdicion.classList.add(
+        "oculto"
+    );
+
+    limpiarTodosLosErrores();
+}
+
+function cancelarEdicion() {
+    reiniciarFormulario();
+
+    mostrarMensaje(
+        mensajeFormulario,
+        "La edición fue cancelada.",
+        "info"
+    );
+}
+
+function limpiarFiltros() {
+    busqueda.value = "";
+    filtroCarrera.value = "todas";
+    filtroSemestre.value = "todos";
+
+    limpiarMensaje(mensajeListado);
+    mostrarAlumnos();
+}
+
+// =====================================
+// MENSAJES DENTRO DE LA PÁGINA
+// =====================================
+
+function mostrarMensaje(elemento, texto, tipo) {
+    elemento.textContent = texto;
+
+    elemento.className =
+        "mensaje-pagina " + tipo;
+}
+
+function limpiarMensaje(elemento) {
+    elemento.textContent = "";
+
+    elemento.className =
+        "mensaje-pagina";
+}
+
+function limpiarMensajes() {
+    limpiarMensaje(mensajeFormulario);
+    limpiarMensaje(mensajeListado);
+}
+
+// =====================================
+// LOCALSTORAGE
+// =====================================
+
+function guardarEnLocalStorage() {
+    localStorage.setItem(
+        "alumnosRegistrados",
+        JSON.stringify(alumnos)
+    );
+}
+
+function obtenerAlumnosGuardados() {
+    const datosGuardados =
+        localStorage.getItem(
+            "alumnosRegistrados"
+        );
+
+    if (!datosGuardados) {
+        return [];
+    }
+
+    try {
+        const datosConvertidos =
+            JSON.parse(datosGuardados);
+
+        if (Array.isArray(datosConvertidos)) {
+            return datosConvertidos;
+        }
+
+        return [];
+    } catch (error) {
+        console.error(
+            "No fue posible recuperar los alumnos guardados.",
+            error
+        );
+
+        return [];
+    }
+}
+
+// Evita que el usuario inserte código HTML.
+function escaparHTML(texto) {
+    const contenedor =
+        document.createElement("div");
+
+    contenedor.textContent = texto;
+
+    return contenedor.innerHTML;
+}
