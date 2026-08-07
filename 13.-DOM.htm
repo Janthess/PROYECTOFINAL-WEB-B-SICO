@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cuenta Bancaria</title>
+</head>
+
+<body>
+  <h1>Simulador de Cuenta Bancaria</h1>
+  
+  <!-- span: crear identificador en una linea 
+       no contiene texto, se va a llenar con
+       los metodos del objeto cuenta -->
+  <p><strong>Titular:</strong><span id="titular"></span></p>
+  <p><strong>Saldo actual:</strong> $<span id="saldo"></span></p>
+
+  <!-- no usamos form porque no enviamos datos a un servidor.
+       es solo manipulación del DOM en el navegador -->
+  <input type="number" id="cantidad" placeholder="Ingresa cantidad">
+  <br>
+  <br>
+  
+  <button onclick="depositar()">Depositar</button>
+  <button onclick="retirar()">Retirar</button>
+  <button onclick="consultarSaldo()">Consultar Saldo</button>
+
+  <script>
+   const cuentaBancaria = {
+    titular: "Juan Pérez",
+    saldo: 5000,
+
+    depositar: function(cantidad) {
+        this.saldo += cantidad;
+        console.log(`Se depositaron $${cantidad}.`);
+    },
+
+    retirar: function(cantidad) {
+        if (cantidad <= this.saldo) {
+            this.saldo -= cantidad;
+            console.log(`Se retiraron $${cantidad}.`);
+        } else {
+            console.log("Fondos insuficientes.");
+        }
+    },
+
+    consultarSaldo: function() {
+        return `El saldo actual es: $${this.saldo}`;
+    }
+};
+
+
+document.getElementById('titular').textContent = cuentaBancaria.titular;
+document.getElementById('saldo').textContent = cuentaBancaria.saldo;
+
+//Funciones Conectadas a botones
+function depositar() {
+
+  const cantidad = parseFloat(document.getElementById('cantidad').value);
+  cuentaBancaria.depositar(cantidad);
+  actualizarSaldo();}
+
+function retirar() {
+
+  const cantidad = parseFloat(document.getElementById('cantidad').value);
+  cuentaBancaria.retirar(cantidad);
+  actualizarSaldo();}
+
+
+function consultarSaldo(){
+  alert('Saldo actual: $' + cuentaBancaria.consultarSaldo());
+}
+
+function actualizarSaldo(){
+  (document.getElementById('saldo').textContent = cuentaBancaria.saldo);
+}
+  
+</script>
+
+</body>
+
+</html>

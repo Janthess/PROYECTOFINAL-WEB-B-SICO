@@ -1,0 +1,33 @@
+const cuentaBancaria = {
+    titular: "Juan Pérez",
+    saldo: 5000,
+
+    depositar: function(cantidad) {
+        this.saldo += cantidad;
+        console.log(`Se depositaron $${cantidad}.`);
+    },
+
+    retirar: function(cantidad) {
+        if (cantidad <= this.saldo) {
+            this.saldo -= cantidad;
+            console.log(`Se retiraron $${cantidad}.`);
+        } else {
+            console.log("Fondos insuficientes.");
+        }
+    },
+
+    consultarSaldo: function() {
+        return `El saldo actual es: $${this.saldo}`;
+    }
+};
+
+// Pruebas
+console.log(cuentaBancaria.consultarSaldo());
+
+cuentaBancaria.depositar(1000);
+console.log(cuentaBancaria.consultarSaldo());
+
+cuentaBancaria.retirar(2000);
+console.log(cuentaBancaria.consultarSaldo());
+
+cuentaBancaria.retirar(5000); // No hay suficiente dinero

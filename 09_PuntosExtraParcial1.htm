@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Corrección de Examen</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background-color: #f4f4f4;
+}
+
+.encabezado{
+    background-color: #1f1f1f;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+h2{
+    text-align: center;
+}
+
+.pregunta{
+    background-color: white;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 10px;
+}
+
+.respuestaIncorrecta{
+    color: red;
+    font-weight: bold;
+}
+
+.respuestaCorrecta{
+    color: green;
+    font-weight: bold;
+}
+
+.porque{
+    margin-top: 10px;
+    color: blue;
+}
+</style>
+</head>
+
+<body>
+
+<div class="encabezado">
+    <h1>José Antonio Ramírez Hernández</h1>
+</div>
+
+<h2>Corrección del Examen de HTML y CSS</h2>
+<h2>19 de junio de 2026</h2>
+
+<!-- Pregunta 1 -->
+<div class="pregunta">
+<h3>1. ¿Qué elementos HTML se mostrarán en fondo amarillo?</h3>
+
+<ul>
+<li>Texto 1</li>
+<li>Texto 2</li>
+<li>Texto 3</li>
+</ul>
+
+<p class="respuestaIncorrecta">
+Mi respuesta: Los que tengan la clase "especial".
+</p>
+
+<p class="respuestaCorrecta">
+Respuesta correcta: Solo "Texto 2", porque es el único elemento que tiene la clase .especial y posee background-color: yellow.
+</p>
+
+<p class="porque">
+¿Por qué me equivoqué? Porque interpreté que varios elementos tenían la clase "especial", cuando solamente el párrafo "Texto 2" la posee.
+</p>
+</div>
+
+<!-- Pregunta 6 -->
+<div class="pregunta">
+<h3>6. ¿Hay márgenes distintos? ¿Por qué?</h3>
+
+<ul>
+<li>Sí</li>
+<li>No</li>
+</ul>
+
+<p class="respuestaIncorrecta">
+Mi respuesta: Sí, porque se especificaron 5px.
+</p>
+
+<p class="respuestaCorrecta">
+Respuesta correcta: No. Todos los elementos p tienen margin: 5px, por lo que los márgenes son iguales.
+</p>
+
+<p class="porque">
+¿Por qué me equivoqué? Porque confundí la existencia del margen con que fueran diferentes.
+</p>
+</div>
+
+<!-- Pregunta 10 -->
+<div class="pregunta">
+<h3>10. ¿Qué etiqueta se usa para agrupar contenido en un bloque semántico?</h3>
+
+<ul>
+<li>&lt;div&gt;</li>
+<li>&lt;span&gt;</li>
+<li>&lt;section&gt;</li>
+<li>&lt;group&gt;</li>
+</ul>
+
+<p class="respuestaIncorrecta">
+Mi respuesta: &lt;div&gt;
+</p>
+
+<p class="respuestaCorrecta">
+Respuesta correcta: &lt;section&gt;
+</p>
+
+<p class="porque">
+¿Por qué me equivoqué? Porque &lt;div&gt; sirve para agrupar contenido, pero no tiene significado semántico. La etiqueta &lt;section&gt; sí representa una sección del documento.
+</p>
+</div>
+
+<!-- Pregunta 11 -->
+<div class="pregunta">
+<h3>11. ¿Qué significa CSS?</h3>
+
+<ul>
+<li>Cascading Style Sheets</li>
+<li>Color Style Sheets</li>
+<li>Cascade Simple Styles</li>
+<li>Custom Style System</li>
+</ul>
+
+<p class="respuestaIncorrecta">
+Mi respuesta: Color Style Sheets.
+</p>
+
+<p class="respuestaCorrecta">
+Respuesta correcta: Cascading Style Sheets.
+</p>
+
+<p class="porque">
+¿Por qué me equivoqué? Porque confundí el significado de las siglas CSS.
+</p>
+</div>
+
+<!-- Pregunta 13 -->
+<div class="pregunta">
+<h3>13. ¿Qué propiedad se usa para redondear esquinas?</h3>
+
+<ul>
+<li>corner-radius</li>
+<li>border-radius</li>
+<li>round-corner</li>
+<li>curve-border</li>
+</ul>
+
+<p class="respuestaIncorrecta">
+Mi respuesta: round-corner.
+</p>
+
+<p class="respuestaCorrecta">
+Respuesta correcta: border-radius.
+</p>
+
+<p class="porque">
+¿Por qué me equivoqué? Porque "round-corner" no es una propiedad válida en CSS; la propiedad correcta es "border-radius".
+</p>
+</div>
+
+</body>
+</html>
